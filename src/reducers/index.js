@@ -1,7 +1,9 @@
 import {
     SET_CATEGORIES,
     SET_POSTS,
-    SET_POST_SORT_METHOD
+    SET_COMMENTS,
+    SET_POST_SORT_METHOD,
+    SET_COMMENT_SORT_METHOD
 } from "../actions";
 
 import { combineReducers } from 'redux';
@@ -31,7 +33,23 @@ function post(state = { posts: [], sortMethod: 'voteScoreDesc' }, action) {
     }
 }
 
+function comment(state = { comments: [], sortMethod: 'voteScoreDesc' }, action) {
+    switch (action.type) {
+        case SET_COMMENTS:
+            return Object.assign({}, state, {
+                comments: action.comments
+            });
+        case SET_COMMENT_SORT_METHOD:
+            return Object.assign({}, state, {
+                sortMethod: action.method
+            });
+        default:
+            return state;
+    }
+}
+
 export default combineReducers({
     categories,
-    post
+    post,
+    comment
 });

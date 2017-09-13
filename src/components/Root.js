@@ -4,6 +4,11 @@ import {Link} from 'react-router-dom';
 import {  } from 'redux';
 import { connect } from 'react-redux';
 import { fetchCategories, fetchPosts } from '../utils/Api';
+import CategoryList from './CategoryList';
+import PostList from './PostList';
+import { sortByAttribute } from '../utils/Sort';
+import Sorter from './Sorter';
+import PropTypes from 'prop-types';
 
 class Root extends Component {
 
@@ -13,75 +18,88 @@ class Root extends Component {
     }
 
     render() {
-        const { categories, post, setPostSortMethod } = this.props;
+        const { category, categories, post, setPostSortMethod } = this.props;
 
         const postSortMethods = [
             {
                 name: 'voteScoreDesc',
-                func: 'sortPostByVoteScoreDesc',
+                attribute: 'voteScore',
+                asc: true,
                 label: 'Vore score descending'
             },
             {
                 name: 'voteScoreAsc',
-                func: 'sortPostByVoteScoreAsc',
+                attribute: 'voteScore',
+                asc: false,
                 label: 'Vore score ascending'
+            },
+            {
+                name: 'timestampAsc',
+                attribute: 'timestamp',
+                asc: true,
+                label: 'Timestamp ascending'
+            },
+            {
+                name: 'timestampDesc',
+                attribute: 'timestamp',
+                asc: false,
+                label: 'Timestamp descending'
             },
         ];
 
-        const sortMethod = postSortMethods.find((item) => item.name === post.sortMethod).func;
+        const sortMethod = postSortMethods.find((item) => item.name === post.sortMethod);
+
+        const posts = post.posts
+            .filter((item) => (category === null || item.category === category.path))
+            .sort((a ,b) => sortByAttribute(a, b, sortMethod.attribute, sortMethod.asc));
+
         return (
             <div>
-                <h2>Categories</h2>
-                <ul>
-                    {categories.map((category) => (
-                        <li key={category.path}>
-                            <Link to={`/${category.path}`}>{category.name}</Link>
-                        </li>
-                    ))}
-                </ul>
+                {category === null ? (
+                    <div>
+                        <h2>Categories</h2>
+                        <CategoryList categories={categories}/>
+                    </div>
+                ) : (
+                    <div>
+                        <h1>{category.name}</h1>
+                        <Link to="/">Back to all categories</Link>
+                    </div>
+                )}
                 <h2>Posts</h2>
                 <p>
                     Sort posts by:
-                    <select value={post.sortMethod} onChange={(event)=> setPostSortMethod(event.target.value)}>
-                        {postSortMethods.map((method) => (
-                            <option key={method.name} value={method.name}>{method.label}</option>
-                        ))}
-                    </select>
+                    <Sorter value={post.sortMethod} sortMethods={postSortMethods} onChange={setPostSortMethod} />
                 </p>
-                <ul>
-                    {post.posts.sort(this[sortMethod]).map((post) => (
-                        <li key={post.id}>
-                            <Link to={`/${post.category}/${post.id}`}>{post.title}</Link>
-                        </li>
-                    ))}
-                </ul>
-                <Link to="/">To root</Link>
+                {posts.length > 0 ? (
+                    <PostList posts={posts}/>
+                ) : (
+                    <p>No posts available</p>
+                )}
+                <Link to="/postForm">Create post</Link>
             </div>
         );
     }
-
-    sortPostByVoteScoreDesc(a, b) {
-        console.log('sorting desc')
-        if (a.voteScore > b.voteScore) {
-            return -1;
-        } else if (a.voteScore < b.voteScore) {
-            return 1;
-        }
-        return 0;
-    }
-
-    sortPostByVoteScoreAsc(a, b) {
-        console.log('sorting asc')
-        if (a.voteScore > b.voteScore) {
-            return 1;
-        } else if (a.voteScore < b.voteScore) {
-            return -1;
-        }
-        return 0;
-    }
 }
-function mapStateToProps({categories, post}) {
+
+Root.propTypes = {
+    category: PropTypes.object,
+    categories: PropTypes.array.isRequired,
+    post: PropTypes.object.isRequired,
+    setPostSortMethod: PropTypes.func.isRequired
+};
+
+function mapStateToProps({categories, post}, { match }) {
+    let category = null;
+
+    if (typeof match.params.category !== 'undefined') {
+        category = categories.find((item) => {
+            return match.params.category === item.path;
+        });
+    }
+
     return {
+        category,
         categories,
         post
     };

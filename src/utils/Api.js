@@ -14,3 +14,8 @@ export function fetchPosts() {
     return fetch(`${API_ENDPOINT}/posts`, fetchInit)
         .then((res) => res.json());
 }
+
+export function fetchComments(postId) {
+    return fetch(`${API_ENDPOINT}/posts/${postId}/comments`, fetchInit)
+        .then((res) => res.json());
+}
