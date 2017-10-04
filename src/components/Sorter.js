@@ -2,10 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const Sorter = (props) => {
-    const { value, sortMethods, onChange } = props;
+    const {
+        value,
+        sortMethods,
+        onChange
+    } = props;
 
     return (
-        <select value={value} onChange={(event)=> onChange(event.target.value)}>
+        <select className="sorter" value={value} onChange={(event) => onChange(event.target.value)}>
             {sortMethods.map((method) => (
                 <option key={method.name} value={method.name}>{method.label}</option>
             ))}

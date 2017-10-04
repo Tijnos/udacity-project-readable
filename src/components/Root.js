@@ -1,101 +1,114 @@
-import {setCategories, setPosts, setPostSortMethod} from '../actions';
-import React, { Component } from 'react';
-import {Link} from 'react-router-dom';
-import {  } from 'redux';
-import { connect } from 'react-redux';
-import { fetchCategories, fetchPosts } from '../utils/Api';
+import {setPostSortMethod, openPostModal, updatePostModalData} from '../actions';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import CategoryList from './CategoryList';
 import PostList from './PostList';
-import { sortByAttribute } from '../utils/Sort';
+import {sortByAttribute} from '../utils/Sort';
 import Sorter from './Sorter';
 import PropTypes from 'prop-types';
+import PostFormModal from "./PostFormModal";
 
 class Root extends Component {
 
-    componentDidMount(){
-        fetchCategories().then((data) => (this.props.setCategories(data.categories)));
-        fetchPosts().then((posts) => (this.props.setPosts(posts.filter((post) => !post.deleted))));
-    }
-
     render() {
-        const { category, categories, post, setPostSortMethod } = this.props;
+        const {
+            category,
+            post,
+            setPostSortMethod,
+            openPostModal,
+            updatePostModalData
+        } = this.props;
 
         const postSortMethods = [
-            {
-                name: 'voteScoreDesc',
-                attribute: 'voteScore',
-                asc: true,
-                label: 'Vore score descending'
-            },
-            {
-                name: 'voteScoreAsc',
-                attribute: 'voteScore',
-                asc: false,
-                label: 'Vore score ascending'
-            },
-            {
-                name: 'timestampAsc',
-                attribute: 'timestamp',
-                asc: true,
-                label: 'Timestamp ascending'
-            },
-            {
-                name: 'timestampDesc',
-                attribute: 'timestamp',
-                asc: false,
-                label: 'Timestamp descending'
-            },
-        ];
-
-        const sortMethod = postSortMethods.find((item) => item.name === post.sortMethod);
-
-        const posts = post.posts
-            .filter((item) => (category === null || item.category === category.path))
-            .sort((a ,b) => sortByAttribute(a, b, sortMethod.attribute, sortMethod.asc));
+                {
+                    name: 'voteScoreAsc',
+                    attribute: 'voteScore',
+                    asc: true,
+                    label: 'Vore score ascending'
+                },
+                {
+                    name: 'voteScoreDesc',
+                    attribute: 'voteScore',
+                    asc: false,
+                    label: 'Vore score descending'
+                },
+                {
+                    name: 'timestampAsc',
+                    attribute: 'timestamp',
+                    asc: true,
+                    label: 'Timestamp ascending'
+                },
+                {
+                    name: 'timestampDesc',
+                    attribute: 'timestamp',
+                    asc: false,
+                    label: 'Timestamp descending'
+                },
+            ],
+            sortMethod = postSortMethods.find((item) => item.name === post.sortMethod),
+            activeCategory = Object.keys(category).length > 0,
+            posts = post.posts
+                .filter((item) => (!activeCategory || item.category === category.path))
+                .sort((a, b) => sortByAttribute(a, b, sortMethod.attribute, sortMethod.asc));
 
         return (
             <div>
-                {category === null ? (
-                    <div>
-                        <h2>Categories</h2>
-                        <CategoryList categories={categories}/>
-                    </div>
-                ) : (
-                    <div>
-                        <h1>{category.name}</h1>
-                        <Link to="/">Back to all categories</Link>
-                    </div>
-                )}
-                <h2>Posts</h2>
-                <p>
-                    Sort posts by:
-                    <Sorter value={post.sortMethod} sortMethods={postSortMethods} onChange={setPostSortMethod} />
-                </p>
+                <CategoryList/>
+
+                <div className="hgroup">
+                    {activeCategory ? (
+                        <h2>Posts in {category.name}</h2>
+                    ) : (
+                        <h2>All posts</h2>
+                    )}
+
+                    <p>
+                        Sort posts by:
+                        <Sorter value={post.sortMethod} sortMethods={postSortMethods} onChange={setPostSortMethod}/>
+                    </p>
+                </div>
+
                 {posts.length > 0 ? (
                     <PostList posts={posts}/>
                 ) : (
                     <p>No posts available</p>
                 )}
-                <Link to="/postForm">Create post</Link>
+
+                <button className="btn" onClick={() => {
+                    updatePostModalData({
+                        category: category && category.path
+                    });
+                    openPostModal();
+                }}>Create post
+                </button>
+
+                <PostFormModal contentLabel="Create new post"/>
             </div>
         );
     }
 }
 
 Root.propTypes = {
+    match: PropTypes.object.isRequired,
     category: PropTypes.object,
     categories: PropTypes.array.isRequired,
     post: PropTypes.object.isRequired,
-    setPostSortMethod: PropTypes.func.isRequired
+    setPostSortMethod: PropTypes.func.isRequired,
+    openPostModal: PropTypes.func.isRequired,
+    updatePostModalData: PropTypes.func.isRequired
 };
 
-function mapStateToProps({categories, post}, { match }) {
-    let category = null;
+function mapStateToProps({categories, post}, {match}) {
+    let category = {};
 
     if (typeof match.params.category !== 'undefined') {
         category = categories.find((item) => {
             return match.params.category === item.path;
         });
+
+        if (typeof category === 'undefined') {
+            category = {};
+        }
     }
 
     return {
@@ -104,15 +117,16 @@ function mapStateToProps({categories, post}, { match }) {
         post
     };
 }
+
 function mapDispatchToProps(dispatch) {
     return {
-        setCategories: (categories) => dispatch(setCategories(categories)),
-        setPosts: (posts) => dispatch(setPosts(posts)),
-        setPostSortMethod: (method) => dispatch(setPostSortMethod(method))
+        setPostSortMethod: (method) => dispatch(setPostSortMethod(method)),
+        openPostModal: () => dispatch(openPostModal()),
+        updatePostModalData: (post) => dispatch(updatePostModalData(post)),
     };
 }
 
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(Root)
+)(Root);

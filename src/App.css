@@ -1,24 +1,254 @@
-.App {
-  text-align: center;
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+body * {
+    box-sizing: border-box;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+div {
+    vertical-align: top;
 }
 
-.App-intro {
-  font-size: large;
+a,
+a:hover,
+a:active,
+a:focus {
+    color: black;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+a:hover {
+    text-decoration: none;
+}
+
+h1,
+h2 {
+    margin: 0 0 15px;
+}
+
+p {
+    margin: 0 0 15px;
+}
+
+.subtitle {
+    font-style: italic;
+}
+
+.category-list {
+    padding-left: 0;
+    list-style-type: none;
+    border-bottom: 1px solid #e4e6e8;
+}
+
+.category-list li {
+    bottom: -1px;
+    display: inline-block;
+    position: relative;
+    margin-right: 15px;
+    transition: background .15s ease-in-out;
+}
+
+.category-list li:hover:not(.active) {
+    background: rgba(228, 230, 232, 0.25);
+}
+
+.category-list li.active {
+    background: white;
+    border-top: 1px solid #e4e6e8;
+    border-left: 1px solid #e4e6e8;
+    border-right: 1px solid #e4e6e8;
+}
+
+.category-list li a {
+    text-decoration: none;
+    color: black;
+    display: block;
+    padding: 10px 15px;
+}
+
+.hgroup:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.hgroup > * {
+    display: inline-block;
+    float: left;
+    vertical-align: bottom;
+    margin: 0 0 15px;
+    line-height: 30px;
+}
+
+.hgroup > :last-child {
+    float: right;
+}
+
+.post-list,
+.comment-list {
+    padding-left: 0;
+    list-style-type: none;
+    margin: 0 0 30px;
+}
+
+.post-list li,
+.comment-list li {
+    border-top: 1px solid #e4e6e8;
+    padding: 30px 0;
+}
+
+.post-list li:last-child,
+.comment-list li:last-child {
+    border-bottom: 1px solid #e4e6e8;
+}
+
+.vote-score {
+    width: 30px;
+    display: inline-block;
+    padding-top: 5px;
+}
+
+.vote-score .up,
+.vote-score .down {
+    width: 0;
+    height: 0;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    outline: 0;
+    margin: 0 auto;
+    display: block;
+}
+
+.vote-score .up {
+    border-bottom: 10px solid #868C93;
+    border-left: 10px solid transparent;;
+    border-right: 10px solid transparent;
+}
+
+.vote-score .down {
+    border-top: 10px solid #868C93;
+    border-left: 10px solid transparent;;
+    border-right: 10px solid transparent;
+}
+
+.vote-score .up:hover {
+    border-bottom-color: #b4bac1;
+}
+
+.vote-score .down:hover {
+    border-top-color: #b4bac1;
+}
+
+.vote-score .up .label,
+.vote-score .down .label {
+    display: none;
+}
+
+.vote-score .score {
+    line-height: 15px;
+    margin: 15px 0;
+    text-align: center;
+}
+
+.vote-score .score .label {
+    display: none;
+}
+
+.post-content,
+.comment-content {
+    display: inline-block;
+    width: calc(100% - 30px);
+    padding: 0 30px;
+}
+
+.btn {
+    color: #FFF;
+    background: none;
+    background-color: #0095ff;
+    border: 1px solid #07c;
+    box-shadow: inset 0 1px 0 #66bfff;
+    border-radius: 2px;
+    padding: 5px;
+    transition: all .1s ease-in;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.btn:hover {
+    color: rgba(255, 255, 255, 0.9);
+    background-color: #07c;
+    border-color: #005999;
+    box-shadow: inset 0 1px 0 #3af;
+}
+
+.btn-group .btn {
+    margin-right: 5px;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+.btn.btn-warning {
+    background-color: #c93e22;
+    border-color: #C93E22;
+    box-shadow: inset 0 1px 0 #E94C22;
+}
+
+.btn.btn-warning:hover {
+    background-color: #BF3A20;
+    border-color: #BB3820;
+    box-shadow: inset 0 1px 0 #D94522;
+}
+
+.ReactModalPortal .btn-close {
+    float: right;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+label .error {
+    font-weight: normal;
+    font-size: 15px;
+    color: #E94C22;
+}
+
+input,
+select {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    height: 30px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    padding: 0 5px;
+    border: 1px solid #868C93
+}
+
+input[readonly] {
+    background-color: #e4e6e8;
+}
+
+select.sorter {
+    display: inline-block;
+    width: auto;
+    border: 1px solid #868C93
+}
+
+textarea {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    height: 100px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #868C93
 }

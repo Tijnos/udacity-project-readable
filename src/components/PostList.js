@@ -1,23 +1,92 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
+import VoteScore from './VoteScore';
+import PostFormModal from './PostFormModal';
+import {updatePostModalData, openPostModal, deletePost} from '../actions/index';
+import {fetchDeletePost} from '../utils/Api';
 
-const PostList = (props) => {
-    const { posts } = props;
+class PostList extends Component {
 
-    return (
-        <ul>
-            {posts.map((post) => (
-                <li key={post.id}>
-                    <Link to={`/${post.category}/${post.id}`}>{post.title}</Link>
-                </li>
-            ))}
-        </ul>
-    );
-};
+    render() {
+        const {
+            posts,
+            comments,
+            openPostModal,
+            updatePostModalData,
+            onDelete
+        } = this.props;
+
+        let commentCount;
+
+        return (
+            <div>
+                <ul className="post-list">
+                    {posts.map((post) => {
+                        commentCount = comments.filter(comment => comment.parentId === post.id).length;
+
+                        return (
+                            <li key={post.id}>
+                                <VoteScore id={post.id} type="post" score={post.voteScore}/>
+
+                                <div className="post-content">
+                                    <h2><Link to={`/${post.category}/${post.id}`}>{post.title}</Link></h2>
+
+                                    <p className="subtitle">{`Posted by ${post.author} on ${new Date(post.timestamp).toDateString()}.
+                                     ${commentCount} ${commentCount === 1 ? 'comment' : 'comments'}`}
+                                    </p>
+
+                                    <div className="btn-group">
+                                        <button className="btn" onClick={() => {
+                                            updatePostModalData(post);
+
+                                            openPostModal();
+                                        }}>Edit
+                                        </button>
+
+                                        <button className="btn btn-warning" onClick={() => {
+                                            fetchDeletePost(post.id);
+
+                                            onDelete(post)
+                                        }}>Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                        );
+                    })}
+                </ul>
+
+                <PostFormModal contentLabel="Edit post"/>
+            </div>
+        );
+    }
+}
 
 PostList.propTypes = {
-    posts: PropTypes.array.isRequired
+    posts: PropTypes.array.isRequired,
+    comments: PropTypes.array.isRequired,
+    openPostModal: PropTypes.func.isRequired,
+    updatePostModalData: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired
 };
 
-export default PostList;
+function mapStateToProps({comment}) {
+    return {
+        comments: comment.comments
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        openPostModal: () => dispatch(openPostModal()),
+        updatePostModalData: (post) => dispatch(updatePostModalData(post)),
+        onDelete: (post) => dispatch(deletePost(post))
+    };
+}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(PostList);
