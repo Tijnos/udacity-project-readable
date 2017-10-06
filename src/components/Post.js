@@ -70,8 +70,9 @@ class Post extends Component {
 
         const sortMethod = commentSortMethods.find((item) => item.name === comment.sortMethod);
 
-        comment.comments = comment.comments
-            .filter((comment) => !comment.deleted && comment.parentId === post.id)
+        comment.comments = comment.allIds
+            .filter((id) => !comment.byId[id].deleted && comment.byId[id].parentId === post.id)
+            .map((id) => comment.byId[id])
             .sort((a, b) => sortByAttribute(a, b, sortMethod.attribute, sortMethod.asc));
 
         return isDeleted ? (
@@ -158,7 +159,7 @@ Post.propTypes = {
     openPostModal: PropTypes.func.isRequired,
     isDeleted: PropTypes.bool,
     updatePostModalData: PropTypes.func.isRequired,
-    voteScore: PropTypes.number.isRequired,
+    voteScore: PropTypes.number,
     setCommentSortMethod: PropTypes.func.isRequired,
     openCommentModal: PropTypes.func.isRequired,
     closeCommentModal: PropTypes.func.isRequired,
@@ -166,9 +167,7 @@ Post.propTypes = {
 };
 
 function mapStateToProps({post, categories, comment}, {match}) {
-    let thePost = post.posts.find((item) => {
-        return match.params.post_id === item.id;
-    });
+    let thePost = post.byId[match.params.post_id] || null;
 
     let theCategory = {};
     if (thePost) {

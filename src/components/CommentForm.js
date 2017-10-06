@@ -44,7 +44,6 @@ class CommentForm extends Component {
             } else if (this.props[name].error) {
                 this.props.updateCommentModalDataError(name, null)
             }
-
             if (this.props[name] && this.props[name].value) {
                 comment[name] = this.props[name].value;
             }

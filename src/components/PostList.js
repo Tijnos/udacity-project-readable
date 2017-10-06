@@ -12,7 +12,7 @@ class PostList extends Component {
     render() {
         const {
             posts,
-            comments,
+            comment,
             openPostModal,
             updatePostModalData,
             onDelete
@@ -24,7 +24,7 @@ class PostList extends Component {
             <div>
                 <ul className="post-list">
                     {posts.map((post) => {
-                        commentCount = comments.filter(comment => comment.parentId === post.id).length;
+                        commentCount = comment.allIds.filter(id => comment.byId[id].parentId === post.id).length;
 
                         return (
                             <li key={post.id}>
@@ -74,7 +74,7 @@ PostList.propTypes = {
 
 function mapStateToProps({comment}) {
     return {
-        comments: comment.comments
+        comment
     };
 }
 

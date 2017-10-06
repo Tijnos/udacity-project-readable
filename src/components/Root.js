@@ -47,8 +47,9 @@ class Root extends Component {
             ],
             sortMethod = postSortMethods.find((item) => item.name === post.sortMethod),
             activeCategory = Object.keys(category).length > 0,
-            posts = post.posts
-                .filter((item) => (!activeCategory || item.category === category.path))
+            posts = post.allIds
+                .filter((postId) => (!activeCategory || post.byId[postId].category === category.path))
+                .map((postId) => post.byId[postId])
                 .sort((a, b) => sortByAttribute(a, b, sortMethod.attribute, sortMethod.asc));
 
         return (

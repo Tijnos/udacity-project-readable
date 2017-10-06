@@ -39,38 +39,55 @@ function categories(state = [], action) {
 }
 
 function post(state = {
-    posts: [],
+    byId: {},
+    allIds: [],
     sortMethod: 'voteScoreDesc',
     modalIsOpen: false,
     postModalData: {}
 }, action) {
 
+    let byId = {},
+        allIds = [];
+
     switch (action.type) {
         case SET_POSTS:
+            byId = {};
+
+            action.posts.forEach((post) => {
+                byId[post.id] = post;
+            });
+
             return Object.assign({}, state, {
-                posts: action.posts
+                byId: byId,
+                allIds: action.posts.map((post) => post.id)
             });
         case SET_POST_SORT_METHOD:
             return Object.assign({}, state, {
                 sortMethod: action.method
             });
         case VOTE_POST_UP:
+            byId = state.byId;
+
+            state.allIds.forEach((id) => {
+                if (id === action.postId) {
+                    byId[id].voteScore++;
+                }
+            });
+
             return Object.assign({}, state, {
-                posts: state.posts.map((post) => {
-                    if (post.id === action.postId) {
-                        post.voteScore++;
-                    }
-                    return post;
-                })
+                byId
             });
         case VOTE_POST_DOWN:
+            byId = state.byId;
+
+            state.allIds.forEach((id) => {
+                if (id === action.postId) {
+                    byId[id].voteScore--;
+                }
+            });
+
             return Object.assign({}, state, {
-                posts: state.posts.map((post) => {
-                    if (post.id === action.postId) {
-                        post.voteScore--;
-                    }
-                    return post;
-                })
+                byId
             });
         case OPEN_POST_MODAL:
             return Object.assign({}, state, {
@@ -111,21 +128,33 @@ function post(state = {
                 postModalData: postModalData
             });
         case ADD_POST:
+            byId = state.byId;
+            allIds = state.allIds;
+
+            byId[action.post.id] = action.post;
+            allIds.push(action.post.id);
+
             return Object.assign({}, state, {
-                posts: [
-                    ...state.posts,
-                    action.post
-                ]
+                byId,
+                allIds
             });
         case UPDATE_POST:
+            byId = state.byId;
+
+            byId[action.post.id] = action.post;
+
             return Object.assign({}, state, {
-                posts: state.posts.map((item) => {
-                    return (item.id === action.post.id) ? action.post : item;
-                })
+                byId
             });
         case DELETE_POST:
+            byId = state.byId;
+
+            allIds = state.allIds.filter((id) => id !== action.post.id);
+            delete byId[action.post.id];
+
             return Object.assign({}, state, {
-                posts: state.posts.filter(post => post.id !== action.post.id)
+                byId,
+                allIds
             });
         default:
             return state;
@@ -133,20 +162,28 @@ function post(state = {
 }
 
 function comment(state = {
-    comments: [],
+    byId: {},
+    allIds: [],
     sortMethod: 'voteScoreDesc',
     modalIsOpen: false,
     commentModalData: {}
 }, action) {
 
+    let byId = {},
+        allIds = [];
+
     switch (action.type) {
         case ADD_COMMENTS:
-            const comments = action.comments.filter((comment) =>
-                typeof state.comments.find((stateComment) => stateComment.id === comment.id) === 'undefined'
-            );
+
+            byId = {};
+
+            action.comments.forEach((comment) => {
+                byId[comment.id] = comment;
+            });
 
             return Object.assign({}, state, {
-                comments: [...state.comments, ...comments]
+                byId: byId,
+                allIds: Object.keys(byId)
             });
         case SET_COMMENT_SORT_METHOD:
             return Object.assign({}, state, {
@@ -191,44 +228,57 @@ function comment(state = {
                 commentModalData: commentModalData
             });
         case ADD_COMMENT:
+            byId = state.byId;
+            allIds = state.allIds;
+
+            byId[action.comment.id] = action.comment;
+            allIds.push(action.comment.id);
+
             return Object.assign({}, state, {
-                comments: [
-                    ...state.comments,
-                    action.comment
-                ]
+                byId,
+                allIds
             });
         case UPDATE_COMMENT:
+            byId = state.byId;
+
+            byId[action.comment.id] = action.comment;
+
             return Object.assign({}, state, {
-                comments: state.comments.map((item) => {
-                    return (item.id === action.comment.id) ? action.comment : item;
-                })
+                byId
             });
         case VOTE_COMMENT_UP:
+            byId = state.byId;
+
+            state.allIds.forEach((id) => {
+                if (id === action.commentId) {
+                    byId[id].voteScore++;
+                }
+            });
+
             return Object.assign({}, state, {
-                comments: state.comments.map((comment) => {
-                    if (comment.id === action.commentId) {
-                        comment.voteScore++;
-                    }
-                    return comment;
-                })
+                byId
             });
         case VOTE_COMMENT_DOWN:
+            byId = state.byId;
+
+            state.allIds.forEach((id) => {
+                if (id === action.commentId) {
+                    byId[id].voteScore--;
+                }
+            });
+
             return Object.assign({}, state, {
-                comments: state.comments.map((comment) => {
-                    if (comment.id === action.commentId) {
-                        comment.voteScore--;
-                    }
-                    return comment;
-                })
+                byId
             });
         case DELETE_COMMENT:
+            byId = state.byId;
+
+            allIds = state.allIds.filter((id) => id !== action.comment.id);
+            delete byId[action.comment.id];
+
             return Object.assign({}, state, {
-                comments: state.comments.map(comment => {
-                    if (comment.id === action.comment.id) {
-                        comment.deleted = true;
-                    }
-                    return comment;
-                })
+                byId,
+                allIds
             });
         default:
             return state;
