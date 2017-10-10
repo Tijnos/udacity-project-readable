@@ -1,3 +1,7 @@
+import {fetchCategories, fetchPosts, fetchComments} from '../utils/Api';
+
+export const GET_COMMENTS = 'GET_COMMENTS';
+
 export const SET_CATEGORIES = 'SET_CATEGORIES';
 
 export const SET_POSTS = 'SET_POSTS';
@@ -25,6 +29,23 @@ export const UPDATE_COMMENT = 'UPDATE_COMMENT';
 export const VOTE_COMMENT_UP = 'VOTE_COMMENT_UP';
 export const VOTE_COMMENT_DOWN = 'VOTE_COMMENT_DOWN';
 export const DELETE_COMMENT = 'DELETE_COMMENT';
+
+export const getPosts = () => dispatch => (
+    fetchPosts()
+        .then(posts => {
+            dispatch(setPosts(posts))
+        })
+);
+
+export const getCategories = () => dispatch => (
+    fetchCategories()
+        .then(categories => dispatch(setCategories(categories)))
+);
+
+export const getComments = () => dispatch => (
+    fetchComments()
+        .then(comments => dispatch(addComments(comments)))
+);
 
 export function setCategories(categories) {
     return {

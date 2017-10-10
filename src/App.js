@@ -1,4 +1,4 @@
-import {setCategories, setPosts, addComments} from './actions/index'
+import {setCategories, setPosts, addComments, getPosts, getCategories} from './actions/index'
 import React, {Component} from 'react';
 import Root from './components/Root';
 import Post from './components/Post';
@@ -6,22 +6,12 @@ import PostForm from './components/PostFormModal';
 import './App.css';
 import {Route} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {fetchCategories, fetchPosts, fetchComments} from './utils/Api';
 
 class App extends Component {
 
     componentDidMount() {
-        fetchCategories().then((data) => (this.props.setCategories(data.categories)));
-
-        fetchPosts().then((posts) => {
-            this.props.setPosts(posts.filter((post) => !post.deleted));
-
-            posts.forEach((post) => {
-                fetchComments(post.id).then((comments) => {
-                    this.props.addComments(comments)
-                });
-            });
-        });
+        getPosts();
+        getCategories();
     }
 
     render() {
