@@ -157,8 +157,13 @@ class PostFormModal extends Component {
                                     ))}
                                 </select>
                             )) || (
-                                <input readOnly="true" type="text"
-                                       value={categories.find((item) => item.path === category.value).name || ''}/>
+                                <select readOnly="true" name="category"
+                                        value={category.value || ''}>
+                                    <option key="" value="">Choose</option>
+                                    {categories.map((category) => (
+                                        <option key={category.path} value={category.path}>{category.name}</option>
+                                    ))}
+                                </select>
                             )}
                             {category.error && (
                                 <p className="error">{category.error}</p>

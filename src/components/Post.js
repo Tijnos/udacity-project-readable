@@ -77,6 +77,11 @@ class Post extends Component {
 
         return isDeleted ? (
             <Redirect to="/"/>
+        ) : Object.keys(post).length  === 0 ? (
+            <div>
+                <h2>Post not found</h2>
+                <Link to="/">Return to overview</Link>
+            </div>
         ) : (
             <div>
                 <CategoryList/>
