@@ -1,4 +1,4 @@
-import {setCategories, setPosts, addComments, getPosts, getCategories} from './actions/index'
+import {setCategories, setPosts, addComments, getPosts, getCategories, getComments} from './actions/index'
 import React, {Component} from 'react';
 import Root from './components/Root';
 import Post from './components/Post';
@@ -10,8 +10,12 @@ import {connect} from 'react-redux';
 class App extends Component {
 
     componentDidMount() {
-        getPosts();
-        getCategories();
+        this.props.getPosts((posts) => {
+            posts.forEach((post) => {
+                this.props.getComments(post.id);
+            });
+        });
+        this.props.getCategories();
     }
 
     render() {
@@ -31,6 +35,9 @@ class App extends Component {
 
 function mapDispatchToProps(dispatch) {
     return {
+        getPosts: (afterFetch) => dispatch(getPosts(afterFetch)),
+        getCategories: () => dispatch(getCategories()),
+        getComments: (postId) => dispatch(getComments(postId)),
         setCategories: (categories) => dispatch(setCategories(categories)),
         setPosts: (posts) => dispatch(setPosts(posts)),
         addComments: (comments) => dispatch(addComments(comments)),

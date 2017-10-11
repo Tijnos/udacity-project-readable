@@ -66,7 +66,7 @@ class PostList extends Component {
 
 PostList.propTypes = {
     posts: PropTypes.array.isRequired,
-    comments: PropTypes.array.isRequired,
+    comment: PropTypes.object.isRequired,
     openPostModal: PropTypes.func.isRequired,
     updatePostModalData: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired

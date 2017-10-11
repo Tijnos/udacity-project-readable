@@ -175,7 +175,7 @@ function comment(state = {
     switch (action.type) {
         case ADD_COMMENTS:
 
-            byId = {};
+            byId = state.byId;
 
             action.comments.forEach((comment) => {
                 byId[comment.id] = comment;

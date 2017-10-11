@@ -30,20 +30,24 @@ export const VOTE_COMMENT_UP = 'VOTE_COMMENT_UP';
 export const VOTE_COMMENT_DOWN = 'VOTE_COMMENT_DOWN';
 export const DELETE_COMMENT = 'DELETE_COMMENT';
 
-export const getPosts = () => dispatch => (
+export const getPosts = (afterFetch) => dispatch => (
     fetchPosts()
         .then(posts => {
-            dispatch(setPosts(posts))
+            if (typeof afterFetch === 'function') {
+                afterFetch(posts)
+            }
+
+            return dispatch(setPosts(posts));
         })
 );
 
 export const getCategories = () => dispatch => (
     fetchCategories()
-        .then(categories => dispatch(setCategories(categories)))
+        .then(categories => dispatch(setCategories(categories.categories)))
 );
 
-export const getComments = () => dispatch => (
-    fetchComments()
+export const getComments = (postId) => dispatch => (
+    fetchComments(postId)
         .then(comments => dispatch(addComments(comments)))
 );
 
